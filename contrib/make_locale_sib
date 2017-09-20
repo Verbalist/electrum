@@ -1,0 +1,53 @@
+#!/usr/bin/env python2
+from StringIO import StringIO
+import os, zipfile, pycurl
+import requests
+import yaml
+
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+os.chdir('..')
+
+config = yaml.load(file('config.yaml', 'r'))
+
+
+# Generate fresh translation template
+if not os.path.exists('lib/locale'):
+    os.mkdir('lib/locale')
+cmd = 'xgettext -s --no-wrap -f app.fil --output=lib/locale/messages.pot'
+print 'Generate template'
+os.system(cmd)
+
+os.chdir('lib')
+
+crowdin_identifier = config['translate']['crowdin_identifier']
+locale_file_name = 'locale/messages.pot'
+
+# Download & unzip
+print 'Download translations'
+zfobj = zipfile.ZipFile(
+    StringIO(requests.request('GET', 'http://crowdin.com/download/project/' + crowdin_identifier + '.zip').content))
+
+print 'Unzip translations'
+for name in zfobj.namelist():
+    print name
+    if name.endswith('/'):
+        if not os.path.exists(name):
+            os.mkdir(name)
+    else:
+        output = open(name, 'w')
+        output.write(zfobj.read(name))
+        output.close()
+
+# Convert .po to .mo
+print 'Installing'
+
+for lang in os.listdir('locale'):
+    if lang.startswith('messages'):
+        continue
+    # Check LC_MESSAGES folder
+    mo_dir = 'locale/%s/LC_MESSAGES' % lang
+    if not os.path.exists(mo_dir):
+        os.mkdir(mo_dir)
+    cmd = 'msgfmt --output-file="%s/electrum.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
+    print 'Installing',lang
+    os.system(cmd)
