@@ -66,11 +66,11 @@ XPUB_HEADERS = {
 # Bitcoin network constants
 TESTNET = False
 NOLNET = False
-ADDRTYPE_P2PKH = 0
-ADDRTYPE_P2SH = 5
+ADDRTYPE_P2PKH = 63
+ADDRTYPE_P2SH = 40
 SEGWIT_HRP = "bc"
-HEADERS_URL = "https://headers.electrum.org/blockchain_headers"
-GENESIS = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
+HEADERS_URL = "http://localhost:9000/blockchain_headers"
+GENESIS = "00000c492bf73490420868bc577680bfc4c60116e7e85343bc624787c21efa4c"
 SERVERLIST = 'servers.json'
 DEFAULT_PORTS = {'t':'50001', 's':'50002'}
 DEFAULT_SERVERS = read_json_dict('servers.json')
